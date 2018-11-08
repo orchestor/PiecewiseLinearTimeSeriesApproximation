@@ -4,18 +4,18 @@
 # from scipy import * #this is needed for some of the matrix stuff
 # from scipy.basic.linalg import *  # part of scipy
 
-# Instead, download the Numeric package... 
-try :
-  from Numeric import *
-  from LinearAlgebra import *
-except ImportError:
-  print "Install and download the Numeric package"
-  print " http://sourceforge.net/project/showfiles.php?group_id=1369&package_id=1351"
-
-
+# Instead, download the Numeric package...
+# try :
+#   from Numeric import *
+#   from LinearAlgebra import *
+# except ImportError:
+#   print "Install and download the Numeric package"
+#   print " http://sourceforge.net/project/showfiles.php?group_id=1369&package_id=1351"
+#
+from numpy import zeros,transpose,linalg
 ###########################################################################
 ###########################################################################
-## the next section of the code offers a way to precompute some 
+## the next section of the code offers a way to precompute some
 ## polynomial range queries in order to be able to compute in O(1) time
 ## the fit error using a polynomial of degree d.
 ##
@@ -27,15 +27,14 @@ except ImportError:
 ## over many ranges of the data points.
 ###########################################################################
 ###########################################################################
-
 def computeBuffer(datapoints, degree):
   """ this precomputes the range sums so that we can
   best fit a polynomial in constant time! The trick is
-  to use prefix sums (has been known for some time). 
+  to use prefix sums (has been known for some time).
   There exists even smarter methods,
   see my CASCON 2002 paper."""
   fastsumbuffer = zeros([2*degree+1,3,len(datapoints)+1],'d')
-  for xexponent in xrange(2*degree+1): 
+  for xexponent in xrange(2*degree+1):
     # we compute more than we need, but what the heck!
     for yexponent in xrange(3):
       fastsumbuffer[xexponent][yexponent][0] = 0.0#datapoints[0][0]**xexponent * datapoints[0][1]**yexponent
@@ -55,9 +54,9 @@ def fastsum(fastsumbuffer,start,end,xexponent, yexponent):
       print "yexponent is too large: ", yexponent, " you can go up to ", len(fastsumbuffer[xexponent])
       raise
     if(end < start): print "you have start and end backward!"
-    if(end >= len(fastsumbuffer[xexponent][yexponent])): 
+    if(end >= len(fastsumbuffer[xexponent][yexponent])):
       print "you are summing up to ", end, " but your buffer has length ", len(fastsumbuffer[xexponent][yexponent])
-      raise 
+      raise
 
 
 def slowsum(datapoints, start, end,xexponent, yexponent):
@@ -71,7 +70,7 @@ def slowsum(datapoints, start, end,xexponent, yexponent):
 def bestfit(data,fastsumbuffer, start, end, degree):
   """ given a fastsumbuffer, we can find the best polynomial matching
   any area of the data in constant time."""
-  if(degree >= end-start) : 
+  if(degree >= end-start) :
     print "*****I'M killing some degrees!!! from ",degree,"to", (end-start-1)
     degree=end-start-1
   matrix = zeros([degree+1, degree+1],'d')
@@ -103,13 +102,14 @@ def slowinterpolate(data,start,end,degree,x):
   return y
 
 def __solve(a,v):
-  return linear_least_squares(a,transpose( v))[0]
+  #return linear_least_squares(a,transpose( v))[0]
+  return linalg.lstsq(a, transpose( v), rcond=-1)[0]
   if(len(a)==1):
     if(abs(a[0][0])<0.00001): print "WWWWWWWWWWOOOOOOOOOO flat instability"
     assert abs(a[0][0]) > 0.0
     return [ 1/a[0][0] *v[0]]
   if(len(a)==2):
-    det =(a[0][0]*a[1][1]-a[0][1]*a[1][0]) 
+    det =(a[0][0]*a[1][1]-a[0][1]*a[1][0])
     if(abs(det) < 1E-10): print "WWWWWWWWWWOOOOOOOOOO linear instability"
     assert abs(det) > 0.0
     return [-(a[0][1]*v[1]-a[1][1]*v[0])/ det   ,     (a[0][0]*v[1]-a[1][0]*v[0])/det]
@@ -121,10 +121,10 @@ def __solve(a,v):
   #return linear_least_squares(a,transpose( v),rcond=1E-15)[0]
 
 
-    
+
 
 def squaredfiterror(data,fastsumbuffer,start,end,degree):
-  """ Compute the sum of the square of the errors. The result seems to 
+  """ Compute the sum of the square of the errors. The result seems to
   be sometimes negative. Probably due to numerical errors. The implementation
   is probably suboptimal and slow. """
   error = 0.0
@@ -141,7 +141,7 @@ def squaredfiterror(data,fastsumbuffer,start,end,degree):
     error += (-1.0) * coefs[d2] * fastsum(fastsumbuffer,start,end,d2,1)
   error += (-1.0) * (-1.0) * fastsum(fastsumbuffer,start,end,0,2)
   return positive(error)
-  
+
 def segmentationsquaredfiterror(data,buffer,tags,verbose=False):
   #tags must have the format [(x0,x1,degree),(x1,x2,degree)...]
   error= 0.0
@@ -151,7 +151,7 @@ def segmentationsquaredfiterror(data,buffer,tags,verbose=False):
     error += squaredfiterror(data,buffer,interval[0],interval[1]+1,interval[2])
   return error
 
-# this is for unit testing purposes 
+# this is for unit testing purposes
 def testfastsums(verbose = 0) :
   """ unit testing! run this periodically! """
   datapoints = []
@@ -159,7 +159,7 @@ def testfastsums(verbose = 0) :
   random.seed(0)
   for x in xrange(10):
     datapoints.append([x,random.random()])
-  degree = 4 
+  degree = 4
   # compute the buffer
   fastsumbuffer = computeBuffer(datapoints,degree)
   for xexponent in xrange(degree+1):
@@ -172,7 +172,7 @@ def testfastsums(verbose = 0) :
 
 
 # this is for unit testing purposes
-def testbestfit() : 
+def testbestfit() :
   """ unit testing"""
   datapoints = []
   # we gather data from a polynomial and try to get the polynomial back!
@@ -195,4 +195,3 @@ def testbestfit() :
   #assert abs(coefs[0]-3)<0.001
   #assert abs(coefs[1]+1)<0.001
   #assert abs(coefs[2]-0.001)<0.0000001
-
