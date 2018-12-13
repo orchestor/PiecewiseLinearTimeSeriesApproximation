@@ -9,13 +9,13 @@ import fastpolyfit
 from tagstofunction import tagstofunction
 from math import sqrt
 import sys
-#import errorplot 
+#import errorplot
 
 
 def cppprocess(data,command,debug=False):
   #print data
   cmd = os.path.abspath("multidegree")+" "+command
-  print "running: ",cmd, " on ", len(data), " data points"
+  #print "running: ",cmd, " on ", len(data), " data points"
   if(debug):
     debugname = "debug"+str(int(time.time()))+".txt"
     print "dumping data points to file "+debugname
@@ -34,11 +34,11 @@ def cppprocess(data,command,debug=False):
   tags = []
   for line in answer:
     #print line
-    if(line.startswith("#")): 
+    if(line.startswith("#")):
       errors = re.findall("# error (.*)", line)
-      if(len(errors) > 0): 
+      if(len(errors) > 0):
         error = float(errors[0])
-        print "error = ", error, float(error)/len(data)
+    #    print "error = ", error, float(error)/len(data)
       else:
         print line
       continue
@@ -77,16 +77,16 @@ def leaveoneout(data,command, samples = 100):
       #print "begin=",inter[0],minusonedata[inter[0]][0]
       #print data[i][0]
       #print "end=",inter[1],minusonedata[inter[1]][0]
-      if((data[i][0] >= minusonedata[inter[0]][0]) and (data[i][0] <= minusonedata[inter[1]][0])): 
-        rightinter = inter 
+      if((data[i][0] >= minusonedata[inter[0]][0]) and (data[i][0] <= minusonedata[inter[1]][0])):
+        rightinter = inter
         #print "ok with ", inter
-      #else: 
+      #else:
       #  #print (data[i][0] >= minusonedata[inter[0]][0])
       #  #print (data[i][0] <= minusonedata[inter[1]][0])
       #  #print data[i][0]
       #  #print minusonedata[inter[1]-1][0]
-      #  #print minusonedata[inter[0]][0] 
-      #  #print "not ok with ",inter 
+      #  #print minusonedata[inter[0]][0]
+      #  #print "not ok with ",inter
     if(rightinter == None):
       rightinter = tags[-1]
       #print "i",i
@@ -94,7 +94,7 @@ def leaveoneout(data,command, samples = 100):
       #print rightinter
       #print "first interval = ", minusonedata[tags[0][0]][0], minusonedata[tags[0][1]][0]
       #print "second interval = ", minusonedata[tags[1][0]][0], minusonedata[tags[1][1]][0]
-      assert (data[i][0] >= minusonedata[rightinter[0]][0]) 
+      assert (data[i][0] >= minusonedata[rightinter[0]][0])
     #print "rightinter", rightinter
     #print tags[-1]
     #print tags[-2]
@@ -105,10 +105,10 @@ def leaveoneout(data,command, samples = 100):
     #print (data[i][0] <= minusonedata[inter[1]][0])
     #print data[i][0]
     loneoutfiterror =  (data[i][1] - fastpolyfit.slowinterpolate(minusonedata,start=rightinter[0],end=rightinter[1],degree=rightinter[2],x=data[i][0])) **2
-    print "leave one out error is ", loneoutfiterror 
+    print "leave one out error is ", loneoutfiterror
     sum += loneoutfiterror   #print len(data)
   #print skip
-  print sum 
+  print sum
   return sqrt(sum / counter)
 
 def cpp(data,command,waitforme=False):
@@ -118,16 +118,16 @@ def cpp(data,command,waitforme=False):
   print tags
   filename = "temp_"+re.sub(" ", "_",command)+"_.eps"
   #  print "data = ",data
-  print "========================"
+  #print "========================"
   #try :
   segmentationplot.plotSegmentation(data,tags,filename,wait=waitforme)
   #except IndexError:
-  #  print "can't generate plot, index error"
-  print after-before
+    #print "can't generate plot, index error"
+  print("This api call takes " + str(after-before) + " seconds to compute.")
   return error,after-before,tags
 
 
-def ecgparser(filename):    
+def ecgparser(filename):
     f = open(filename)
     data = []
     for line in f:
@@ -136,13 +136,13 @@ def ecgparser(filename):
         data.append((dataentry[0],dataentry[1]))
     f.close()
     return data
-    
-  
+
+
 
 def normalizex(data):
   for i in range(len(data)):
     data[i]=(i,data[i][1])
-    
+
 if __name__ == "__main__":
   #<<<<<<< cppmultidegree.py
   #data0 = ecgparser("/home/lemire/CVS/ylb/samples/ECG/100.txt")[:1000]
@@ -190,27 +190,27 @@ if __name__ == "__main__":
             budget = 20
   if(temp):
             budget = 10
-  try: 
+  try:
           sys.argv.index("--microsoft")
           microsoft = True
   except: pass
-  try: 
+  try:
           sys.argv.index("--timings")
           timings = True
   except: pass
-  try: 
+  try:
           sys.argv.index("--onlycore")
           onlycore = True
   except: pass
-  try: 
+  try:
           sys.argv.index("--temp")
           temp = True
   except: pass
-  try: 
+  try:
           sys.argv.index("--ecg")
           ecg = True
   except: pass
-  try: 
+  try:
           sys.argv.index("--oneecg")
           oneecg = True
   except: pass
@@ -220,11 +220,11 @@ if __name__ == "__main__":
           sys.argv.index("--leaveone")
           leaveone = True
   except: pass
-  try: 
+  try:
           sys.argv.index("--wait")
           wait = True
   except: pass
-  try: 
+  try:
           sys.argv.index("--optimal")
           opti = True
   except: pass
@@ -248,7 +248,7 @@ if __name__ == "__main__":
           downsampling = int(sys.argv[i+1])
   except: pass
   dtsrc= []
-  if(oneecg): 
+  if(oneecg):
           #for i in range(5):
           dtsrc.append(ecgparser("/home/lemire/CVS/ylb/samples/ECG/100.txt")[290:200+290][:limit])
           dtsrc.append(ecgparser("/home/lemire/CVS/ylb/samples/ECG/101.txt")[0:200+0][:limit])
@@ -256,7 +256,7 @@ if __name__ == "__main__":
           dtsrc.append(ecgparser("/home/lemire/CVS/ylb/samples/ECG/103.txt")[200:200+200][:limit])
           dtsrc.append(ecgparser("/home/lemire/CVS/ylb/samples/ECG/104.txt")[200:200+200][:limit])
           dtsrc.append(ecgparser("/home/lemire/CVS/ylb/samples/ECG/105.txt")[100:200+100][:limit])
-  if(ecg): 
+  if(ecg):
           for i in range(5):
                   dtsrc.append(ecgparser("/home/lemire/CVS/ylb/samples/ECG/100.txt")[i*600+250:(i+1)*600+250][:limit])
           for i in range(5):
@@ -305,7 +305,7 @@ if __name__ == "__main__":
         v=random.normalvariate(0,1)
         dat.append((i,v))
       dtsrc.append(dat[:limit])
-  if(temp): 
+  if(temp):
     for n in ["../data/0-60S.dat","../data/0-90N.dat", "../data/90N-60S.dat"]:
             data = temperatureparser.readCDIAC(n)
             for i in range(3):
@@ -319,7 +319,7 @@ if __name__ == "__main__":
     for j in range(len(dtsrc)):
       dtsrc[j] = downsample(dtsrc[j],downsampling)
       print "new length = ", len(dtsrc[j])
-  dtsrc = dtsrc[:numberofsources]  
+  dtsrc = dtsrc[:numberofsources]
   all =  []
   l1outall = []
   log = open("cppmultidegree_"+str(int(time.time()))+".log","w")
@@ -332,13 +332,13 @@ if __name__ == "__main__":
       log.write("i = "+str(i)+" \n")
       error = [i]
       error.append(cpp(data,'-k '+str(budget)+' -d 2 --heuristic1',wait)[:2])
-      if( not onlycore): 
+      if( not onlycore):
             error.append(cpp(data,'-k '+str(budget)+' -d 2 --heuristic2',wait)[:2])
       error.append(cpp(data,'-k '+str(budget)+' -d 2',wait)[:2])
       if (not onlycore):
             error.append(cpp(data,'-k '+str(budget)+' -d 2 --topdown ',wait)[:2])
       error.append(cpp(data,'-k '+str(budget)+' --topdownlinear',wait)[:2])
-      if (not onlycore): 
+      if (not onlycore):
             error.append(cpp(data,'-k '+str(budget)+' --topdownflat ',wait)[:2])
       all.append(error)
       log.write("--error,time--- \n")
@@ -346,7 +346,7 @@ if __name__ == "__main__":
       log.flush()
     for line in all:
       print line
-  else: 
+  else:
    for data in dtsrc:
     error =[]
     l1out = []
@@ -355,27 +355,27 @@ if __name__ == "__main__":
     normalizex(data)
     if(leaveone):
       l1out.append( leaveoneout(data, '-k '+str(budget)+' -d 2 --heuristic1') )
-      #if( not onlycore): 
+      #if( not onlycore):
       #  l1out.append( leaveoneout(data, '-k '+str(budget)+' -d 2 --heuristic2') )
-      #if( not onlycore): 
+      #if( not onlycore):
       #  l1out.append( leaveoneout(data, '-k '+str(budget)+' -d 2 --topdown') )
       l1out.append( leaveoneout(data, '-k '+str(budget)+' -d 2 --topdownlinear') )
-      if( not onlycore): 
+      if( not onlycore):
         l1out.append( leaveoneout(data, '-k '+str(budget)+' -d 1 --topdownflat') )
       log.write("--leave one out--- \n")
       log.write(str(l1out)+"\n")
     l1outall.append(l1out)
     error.append(cpp(data,'-k '+str(budget)+' -d 2 --heuristic1',wait)[:2])
-    #if( not onlycore): 
+    #if( not onlycore):
     #        error.append(cpp(data,'-k '+str(budget)+' -d 2 --heuristic2',wait)[:2])
-    if(opti): 
+    if(opti):
       error.append(cpp(data,'-k '+str(budget)+' -dmin 1 -d 2',wait)[:2])
       error.append(cpp(data,'-k '+str(budget)+' -dmin 0 -d 2',wait)[:2])
       error.append(cpp(data,'-k '+str(budget)+' -dmin 0 -d 1',wait)[:2])
     #if (not onlycore):
     #        error.append(cpp(data,'-k '+str(budget)+' -d 2 --topdown ',wait)[:2])
     error.append(cpp(data,'-k '+str(budget)+' --topdownlinear',wait)[:2])
-    #if (not onlycore): 
+    #if (not onlycore):
     error.append(cpp(data,'-k '+str(budget)+' --topdownflat ',wait)[:2])
     all.append(error)
     log.write("--error,time--- \n")
@@ -392,6 +392,3 @@ if __name__ == "__main__":
           m = max(array)[0]
           return [(e/m,t) for e,t in array]
   #errorplot.ploterrortimes([fixrange(case) for case in all])
-  
-  
-
