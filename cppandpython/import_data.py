@@ -10,14 +10,14 @@ from pandas import Timestamp
 df = pd.read_csv("temp.csv")
 df = df.fillna(0)
 print(df.head())
-df['Col_sum'] = df.iloc[:, 3:].apply(lambda x: x.sum(), axis=1)
+df['Col_sum'] = df.iloc[:, 2:].apply(lambda x: x.sum(), axis=1)
 df.insert(0, 'ID', range(0, len(df)))
 
-df.to_csv('demo.txt', columns = ['ID', 'Col_sum'], header=False, index = False, sep ='\t')
-#print(df.head())
-#print(plt.figure())
-#print(df['Col_sum'].plot())
-#print(plt.show())
+df.to_csv('temp.txt', columns = ['ID', 'Col_sum'], header=False, index = False, sep ='\t')
+print(df.head())
+print(plt.figure())
+print(df['Col_sum'].plot())
+print(plt.show())
 
 
 
